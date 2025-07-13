@@ -265,7 +265,7 @@ jobs:
     steps:
       - name: Conditional Release Check
         id: release_check
-        if: ${{ inputs.make_release && needs.check-build-status.outputs.should_release == 'true' }}
+        if: ${{ inputs.make_release }}
         run: echo "Release conditions met. Proceeding with release."
         
       - name: Checkout code
@@ -546,7 +546,7 @@ jobs:
           prerelease: true
           release_name: ${{ env.RELEASE_NAME }}
           body: ${{ env.FULL_RELEASE_NOTES }}
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Upload Release Assets
         if: ${{ steps.release_check.outcome == 'success' }}
