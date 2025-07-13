@@ -487,81 +487,33 @@ jobs:
               SUSFS_COMMIT_HASH=$(git ls-remote "https://gitlab.com/$GITLAB_OWNER/$GITLAB_REPO.git" "refs/heads/$susfs_branch_name" | awk '{ print $1 }')
               SUSFS_COMMIT_HASH="${SUSFS_COMMIT_HASH:-UNKNOWN_COMMIT}"
               SUSFS_COMMIT_URL="https://gitlab.com/$GITLAB_OWNER/$GITLAB_REPO/-/commit/$SUSFS_COMMIT_HASH"
-              FINAL_RELEASE_NOTES+="\n - ${kernel_id}: [${SUSFS_COMMIT_HASH}](${SUSFS_COMMIT_URL})"
-            else
-              echo "Warning: SUSFS branch name not found for kernel ID: $kernel_id. Cannot fetch commit info." >&2
-            fi
-          done
-          
-          FINAL_RELEASE_NOTES+="\n\n</details>"
-          
-          echo "FULL_RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          echo -e "$FINAL_RELEASE_NOTES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          
-      - name: Download Artifacts
-        if: ${{ steps.release_check.outcome == 'success' }}
-        uses: actions/download-artifact@v4
-        with:
-          path: release-artifacts-${{ github.run_id }}
-          
-      - name: Prepare Artifacts for Upload
-        if: ${{ steps.release_check.outcome == 'success' }}
+              
+        trigger-release:
+              runs-on: ubuntu-latest
+              permissions:
+    contents: write
+  needs:
+      - check-build-status
+      - get_manager
+  if: always()
+  steps:
+  - name: Conditional Release Check
+  id: release_check
+  
+if: ${{ inputs.make_release }}
+run: echo "Release conditions met. Proceeding with release."
+  - name: Checkout code
+  uses: actions/checkout@v4
+    - name: Download Artifacts
+    uses: actions/download-artifact@v4
+    with:
+    path: release-artifacts-${{ github.run_id }}
+    - name: Prepare Artifacts for Download
         run: |
-          # Create a new directory for release assets
           mkdir -p release-assets
-          
-          # Find and copy all artifacts to a flat directory structure
           find ./release-artifacts-${{ github.run_id }} -type f -exec cp -v {} ./release-assets \;
-          
-          # Generate checksums
           cd release-assets
           sha256sum * > SHA256SUMS.txt
           cd ..
-          
-          echo "Artifacts prepared for upload:"
+          echo "Artifacts prepared for download:"
           ls -lh ./release-assets
-          
-      - name: Create GitHub Release
-        if: ${{ steps.release_check.outcome == 'success' }}
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ env.NEW_TAG }}
-          prerelease: true
-          release_name: ${{ env.RELEASE_NAME }}
-          body: ${{ env.FULL_RELEASE_NOTES }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Upload Release Assets
-        if: ${{ steps.release_check.outcome == 'success' }}
-        env:
-          GH_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        run: |
-          echo "Uploading release assets..."
-          
-          # Upload all files in the release-assets directory
-          for file in ./release-assets/*; do
-            echo "Uploading $file"
-            gh release upload "${{ env.NEW_TAG }}" "$file" || echo "Failed to upload $file"
-          done
-          
-          echo "Upload completed!"
-          
-      - name: Verify Uploaded Assets
-        if: ${{ steps.release_check.outcome == 'success' }}
-        run: |
-          echo "Uploaded assets:"
-          gh release view "${{ env.NEW_TAG }}" --json assets -q '.assets[].name'
-
-      - name: send telegram message on push
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          TELEGRAM_MESSAGE_THREAD_ID: ${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}
-        run: |
-            curl -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID" \
-            -d "message_thread_id=$TELEGRAM_MESSAGE_THREAD_ID" \
-            -d "text=Latest release: 
-            https://github.com/ShirkNeko/GKI_KernelSU_SUSFS/releases/tag/${{ env.NEW_TAG }}
-            ${{ env.RELEASE_NOTES }}"    
