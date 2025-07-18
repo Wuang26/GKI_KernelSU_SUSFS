@@ -43,6 +43,11 @@ on:
         - Dev(开发)
         - Other(其他/指定)
         default: Stable(标准)
+      kernel_name:
+        description: 'Custom kernel name (e.g., Kousei)'
+        required: false
+        type: string
+        default: 'Kousei'
       version:
         description: 'Custom version name (e.g., characters after 5.10.198 / leave blank to use default version number)'
         required: false
@@ -82,6 +87,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
 
   build-kernel-a13-5-10:
     if: contains(github.event.inputs.kernels_to_build, 'all') || contains(github.event.inputs.kernels_to_build, 'a13-5.10')
@@ -94,6 +100,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
 
   build-kernel-a13-5-15:
     if: contains(github.event.inputs.kernels_to_build, 'all') || contains(github.event.inputs.kernels_to_build, 'a13-5.15')
@@ -106,6 +113,8 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
+      
 
   build-kernel-a14-5-15:
     if: contains(github.event.inputs.kernels_to_build, 'all') || contains(github.event.inputs.kernels_to_build, 'a14-5.15')
@@ -118,6 +127,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
 
   build-kernel-a14-6-1:
     if: contains(github.event.inputs.kernels_to_build, 'all') || contains(github.event.inputs.kernels_to_build, 'a14-6.1')
@@ -130,6 +140,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
 
   build-kernel-a15-6-6:
     if: contains(github.event.inputs.kernels_to_build, 'all') || contains(github.event.inputs.kernels_to_build, 'a15-6.6')
@@ -142,6 +153,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
 
   check-build-status:
     runs-on: ubuntu-latest
