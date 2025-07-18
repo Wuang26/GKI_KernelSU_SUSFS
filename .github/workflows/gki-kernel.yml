@@ -485,17 +485,18 @@ jobs:
           # Remove check_defconfig
           sed -i 's/check_defconfig//' ./common/build.config.gki
 
-      - name: 配置内核名称
+      - name: Cấu hình tên kernel
         run: |
-          echo "更改为配置目录: $CONFIG..."
+          echo "Thay đổi thư mục cấu hình: $CONFIG..."
           cd "$CONFIG"
           
-          if [ ! -z ${{ inputs.version }} ]; then
-            echo "版本号不为空"
-            sed -i '$s|echo "\$res"|echo "${{ inputs.version }}"|' ./common/scripts/setlocalversion
+          CUSTOM_NAME="${{ inputs.kernel_name }}"
+          if [ ! -z "${{ inputs.version }}" ]; then
+          echo "Số phiên bản không được để trống"
+          sed -i '$s|echo "\$res"|echo "${{ inputs.version }}"|' ./common/scripts/setlocalversion
           else
-            echo "版本号为空，使用默认值"
-            sed -i '$s|echo "\$res"|echo "\$res-Kousei"|' ./common/scripts/setlocalversion
+          echo "Số phiên bản trống, hãy sử dụng kernel_name làm hậu tố"
+          sed -i '$s|echo "\$res"|echo "\$res-${CUSTOM_NAME}"|' ./common/scripts/setlocalversion
           fi
 
           # 如果你需要改构建时间,请把以下变量 CURRENT_TIME 修改为如下例子字符串,如:CURRENT_TIME="Sat Jun 07 06:29:29 UTC 2025"
