@@ -30,6 +30,10 @@ on:
         description: '自定义版本名(如6.1.93后面的字符/留空则使用默认版本号)'
         required: false
         type: string
+      kernel_name:
+        description: 'Custom kernel name (e.g., Kousei)'
+        required: false
+        type: string
       use_zram:
         description: '是否开启增加更多ZRAM算法?'
         required: true
@@ -57,6 +61,7 @@ jobs:
       version: ${{ inputs.version }}
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
+      kernel_name: ${{ inputs.kernel_name }}
   get-ksu-manager:
     if: ${{ inputs.get_manager }}
     uses: ./.github/workflows/get-manager.yml
