@@ -14,6 +14,10 @@ on:
         required: true
         type: string
         default: Next
+      kernel_name:
+        description: 'Custom kernel name (e.g., Kousei)'
+        required: false
+        type: string
       kernelsu_branch:
         required: true
         type: string
@@ -75,3 +79,4 @@ jobs:
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
       supp_op: ${{ inputs.supp_op || false }}
+      kernel_name: ${{ inputs.kernel_name }}
