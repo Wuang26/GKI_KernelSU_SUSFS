@@ -27,6 +27,10 @@ on:
         required: true
         type: boolean
         default: true
+      kernel_name:
+        description: 'Custom kernel name (e.g., Kousei)'
+        required: false
+        type: string
       use_kpm:
         description: '是否开启KPM功能?'
         required: true
@@ -89,3 +93,4 @@ jobs:
       use_zram: ${{ inputs.use_zram }}
       use_kpm: ${{ inputs.use_kpm }}
       supp_op: ${{ inputs.supp_op || false }}
+      kernel_name: ${{ inputs.kernel_name }}
