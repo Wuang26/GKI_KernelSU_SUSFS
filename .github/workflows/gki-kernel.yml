@@ -28,6 +28,9 @@ on:
       kernelsu_branch:
         required: true
         type: string
+      kernel_name:
+        required: false
+        type: string
       # kernelsu_branch_other:
       #   required: false
       #   type: string
